@@ -43,4 +43,4 @@ This project predicts customer churn for a telecom company using Logistic Regres
 [Watch the presentation](https://youtu.be/your-link-here)
 
 ## Author
-[Your Name] – [Your Student ID]
+[Na Kuan Li] – [BIT_B2201F-2505002]
