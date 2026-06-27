@@ -39,8 +39,7 @@ This project predicts customer churn for a telecom company using Logistic Regres
 2. Target high‑risk customers (tenure <12 months & monthly charges >$70) with retention offers.
 3. Bundle online security and tech support to increase service adoption.
 
-## Video Demo
-[Watch the presentation](https://youtu.be/your-link-here)
+
 
 ## Author
 [Na Kuan Li] – [BIT_B2201F-2505002]
