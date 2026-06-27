@@ -1,4 +1,4 @@
-# Telco Customer Churn Prediction – A++ Project
+# Telco Customer Churn Prediction – Project
 
 ## Overview
 This project predicts customer churn for a telecom company using Logistic Regression and Random Forest. It includes exploratory data analysis, feature engineering, model training, evaluation, and an interactive Streamlit dashboard. The entire environment is containerised with Docker.
