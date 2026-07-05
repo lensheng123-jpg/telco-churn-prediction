@@ -31,7 +31,7 @@ This project predicts customer churn for a telecom company using Logistic Regres
 3. Open `http://localhost:8501`
 
 ## Results
-- **Random Forest** achieved **81% accuracy** and **0.85 ROC‑AUC**, outperforming Logistic Regression.
+- **Logistic Regression** achieved **79.39% accuracy** and **0.8258 ROC‑AUC**, outperforming Logistic Regression.
 - Key predictors: tenure, monthly charges, contract type, and number of services.
 
 ## Recommendations
