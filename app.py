@@ -120,15 +120,41 @@ if dark_mode:
             color: #FFFFFF !important;
         }
         
-        /* Expander styling */
+        /* === EXPANDER STYLING - FIXED FOR DARK MODE === */
         .stExpander {
             background-color: #1E1E1E !important;
             color: #FFFFFF !important;
+            border: 1px solid #333333 !important;
+            border-radius: 8px !important;
         }
         .stExpander .stExpanderHeader {
             color: #FFFFFF !important;
+            background-color: #2A2A2A !important;
+            border-radius: 8px 8px 0 0 !important;
+            padding: 12px !important;
         }
-        .stExpander .stMarkdown {
+        .stExpander .stExpanderHeader:hover {
+            background-color: #333333 !important;
+        }
+        /* EXPANDER CONTENT AREA - FORCE DARK */
+        .stExpander .stExpanderContent {
+            background-color: #1E1E1E !important;
+            color: #FFFFFF !important;
+            padding: 10px !important;
+            border-radius: 0 0 8px 8px !important;
+        }
+        .stExpander .stExpanderContent .stMarkdown {
+            color: #FFFFFF !important;
+        }
+        .stExpander .stExpanderContent .stColumn .stMarkdown {
+            color: #FFFFFF !important;
+        }
+        .stExpander .stExpanderContent .stSubheader {
+            color: #FFFFFF !important;
+        }
+        
+        /* === SUBHEADER INSIDE EXPANDER === */
+        .stSubheader {
             color: #FFFFFF !important;
         }
         </style>
@@ -320,7 +346,7 @@ for name in ['tenure', 'MonthlyCharges', 'TotalServices']:
     })
 st.dataframe(pd.DataFrame(driver_data), use_container_width=True)
 
-# --- RETENTION SIMULATOR ---
+# --- RETENTION SIMULATOR WITH VISUAL TREND ---
 st.markdown("---")
 st.subheader("💡 Retention Simulator")
 col_s1, col_s2 = st.columns(2)
@@ -336,8 +362,31 @@ improvement = (prob - prob_whatif) * 100
 
 with col_s1:
     st.metric("Current Risk", f"{prob:.0%}")
+
 with col_s2:
-    st.metric("If 2-Year Contract", f"{prob_whatif:.0%}", delta=f"-{improvement:.0f}%", delta_color="normal")
+    # Determine the trend category
+    if improvement > 5:
+        trend_label = "🔥 Best (Drops Significantly)"
+        delta_color = "normal"
+    elif improvement > 1:
+        trend_label = "✅ Good (Drops Slightly)"
+        delta_color = "normal"
+    elif improvement > -1:
+        trend_label = "➖ Neutral (No Change)"
+        delta_color = "off"
+    elif improvement > -5:
+        trend_label = "⚠️ Poor (Drops Very Little)"
+        delta_color = "inverse"
+    else:
+        trend_label = "🚨 Worst (Risk Increases)"
+        delta_color = "inverse"
+    
+    st.metric(
+        "If 2-Year Contract",
+        f"{prob_whatif:.0%}",
+        delta=f"{trend_label} ({improvement:.0f}%)",
+        delta_color=delta_color
+    )
 
 st.caption("💡 Simulate different customer profiles by adjusting the sliders above.")
 
@@ -361,7 +410,7 @@ st.markdown("---")
 col_seg, col_seg2 = st.columns(2)
 with col_seg:
     st.subheader("🏷️ Customer Segment")
-# Custom light blue styled segment label
+    # Custom light blue styled segment label
     st.markdown(f'<div style="background-color: #1E3A5F; padding: 12px; border-radius: 8px; border-left: 5px solid #4FC3F7; color: #B3E5FC; font-weight: bold; font-size: 18px;">🏷️ {segment_name}</div>', unsafe_allow_html=True)
 # --- BENCHMARKING (Compare to Average) ---
 st.markdown("---")
