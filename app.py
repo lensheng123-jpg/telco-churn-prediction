@@ -113,6 +113,16 @@ if dark_mode:
         .stSidebar .stSidebarContent label {
             color: #FFFFFF !important;
         }
+        /* === RETENTION SIMULATOR TEXT - FIX === */
+        .stMetric .stMetricLabel {
+            color: #FFFFFF !important;
+        }
+        .stMetric .stMetricValue {
+            color: #FFFFFF !important;
+        }
+        .stMetric .stMetricDelta {
+            color: #AAAAAA !important;
+        }
         .st-emotion-cache-1r6slb0 .stToggle label {
             color: #FFFFFF !important;
         }
@@ -120,7 +130,7 @@ if dark_mode:
             color: #FFFFFF !important;
         }
         
-        /* === EXPANDER STYLING - FIXED FOR DARK MODE === */
+        /* === EXPANDER STYLING - ULTIMATE FIX FOR DARK MODE === */
         .stExpander {
             background-color: #1E1E1E !important;
             color: #FFFFFF !important;
@@ -136,26 +146,39 @@ if dark_mode:
         .stExpander .stExpanderHeader:hover {
             background-color: #333333 !important;
         }
-        /* EXPANDER CONTENT AREA - FORCE DARK */
-        .stExpander .stExpanderContent {
+        /* FORCE EXPANDER CONTENT TO BE DARK - THIS FIXES THE WHITE ISSUE */
+        .stExpander .stExpanderContent,
+        .stExpander .stExpanderContent .stMarkdown,
+        .stExpander .stExpanderContent .stColumn,
+        .stExpander .stExpanderContent .stColumn .stMarkdown,
+        .stExpander .stExpanderContent .stSubheader,
+        .stExpander .stExpanderContent .stDataFrame,
+        .stExpander .stExpanderContent .stDataFrame table,
+        .stExpander .stExpanderContent .stDataFrame tbody,
+        .stExpander .stExpanderContent .stDataFrame thead,
+        .stExpander .stExpanderContent .stDataFrame tbody td,
+        .stExpander .stExpanderContent .stDataFrame thead th,
+        .stExpander .stExpanderContent .stAlert,
+        .stExpander .stExpanderContent .stAlert .stAlertContent {
             background-color: #1E1E1E !important;
-            color: #FFFFFF !important;
-            padding: 10px !important;
-            border-radius: 0 0 8px 8px !important;
-        }
-        .stExpander .stExpanderContent .stMarkdown {
-            color: #FFFFFF !important;
-        }
-        .stExpander .stExpanderContent .stColumn .stMarkdown {
-            color: #FFFFFF !important;
-        }
-        .stExpander .stExpanderContent .stSubheader {
             color: #FFFFFF !important;
         }
         
-        /* === SUBHEADER INSIDE EXPANDER === */
+        /* FORCE FIGURES (matplotlib) BACKGROUND TO BE DARK */
+        .stExpander .stExpanderContent .stImage,
+        .stExpander .stExpanderContent .stImage img {
+            background-color: #1E1E1E !important;
+        }
+        
+        /* FORCE SUBHEADERS INSIDE EXPANDER */
         .stSubheader {
             color: #FFFFFF !important;
+        }
+        
+        /* STREAMLIT PLOT CONTAINER */
+        .stPlotlyChart,
+        .stImage {
+            background-color: transparent !important;
         }
         </style>
         """,
@@ -346,49 +369,85 @@ for name in ['tenure', 'MonthlyCharges', 'TotalServices']:
     })
 st.dataframe(pd.DataFrame(driver_data), use_container_width=True)
 
-# --- RETENTION SIMULATOR WITH VISUAL TREND ---
+# --- RETENTION SIMULATOR WITH VISUAL TREND (DYNAMIC) ---
 st.markdown("---")
 st.subheader("💡 Retention Simulator")
-col_s1, col_s2 = st.columns(2)
+st.caption("See how risk changes if we improve the customer's profile.")
 
-# Simulate: Convert to 2-year contract
-feature_dict_whatif = feature_dict.copy()
-feature_dict_whatif['Contract_Two year'] = 1
-feature_dict_whatif['Contract_One year'] = 0
-X_whatif = pd.DataFrame([feature_dict_whatif])[feature_names]
-X_whatif_scaled = scaler.transform(X_whatif)
-prob_whatif = model.predict_proba(X_whatif_scaled)[0][1]
-improvement = (prob - prob_whatif) * 100
+col_s1, col_s2, col_s3 = st.columns(3)
+
+# SIMULATION 1: What if we increase tenure?
+tenure_whatif = min(tenure + 24, 72)  # Add 24 months, max 72
+feature_dict_tenure = feature_dict.copy()
+feature_dict_tenure['tenure'] = tenure_whatif
+if 'TotalCharges' in feature_names:
+    feature_dict_tenure['TotalCharges'] = tenure_whatif * monthly_charges
+X_tenure = pd.DataFrame([feature_dict_tenure])[feature_names]
+X_tenure_scaled = scaler.transform(X_tenure)
+prob_tenure = model.predict_proba(X_tenure_scaled)[0][1]
+tenure_improvement = (prob - prob_tenure) * 100
 
 with col_s1:
-    st.metric("Current Risk", f"{prob:.0%}")
+    if tenure_improvement > 0:
+        delta_color = "normal"
+        delta_label = f"↓ -{tenure_improvement:.0f}%"
+    else:
+        delta_color = "inverse"
+        delta_label = f"↑ +{abs(tenure_improvement):.0f}%"
+    st.metric(
+        f"If Tenure +24 months",
+        f"{prob_tenure:.0%}",
+        delta=delta_label,
+        delta_color=delta_color
+    )
+
+# SIMULATION 2: What if we add services?
+services_whatif = min(total_services + 3, 6)  # Add 3 services, max 6
+feature_dict_services = feature_dict.copy()
+feature_dict_services['TotalServices'] = services_whatif
+X_services = pd.DataFrame([feature_dict_services])[feature_names]
+X_services_scaled = scaler.transform(X_services)
+prob_services = model.predict_proba(X_services_scaled)[0][1]
+services_improvement = (prob - prob_services) * 100
 
 with col_s2:
-    # Determine the trend category
-    if improvement > 5:
-        trend_label = "🔥 Best (Drops Significantly)"
+    if services_improvement > 0:
         delta_color = "normal"
-    elif improvement > 1:
-        trend_label = "✅ Good (Drops Slightly)"
-        delta_color = "normal"
-    elif improvement > -1:
-        trend_label = "➖ Neutral (No Change)"
-        delta_color = "off"
-    elif improvement > -5:
-        trend_label = "⚠️ Poor (Drops Very Little)"
-        delta_color = "inverse"
+        delta_label = f"↓ -{services_improvement:.0f}%"
     else:
-        trend_label = "🚨 Worst (Risk Increases)"
         delta_color = "inverse"
-    
+        delta_label = f"↑ +{abs(services_improvement):.0f}%"
     st.metric(
-        "If 2-Year Contract",
-        f"{prob_whatif:.0%}",
-        delta=f"{trend_label} ({improvement:.0f}%)",
+        f"If +3 Services",
+        f"{prob_services:.0%}",
+        delta=delta_label,
         delta_color=delta_color
     )
 
 st.caption("💡 Simulate different customer profiles by adjusting the sliders above.")
+
+# SIMULATION 3: What if we upgrade to 2-year contract?
+feature_dict_contract = feature_dict.copy()
+feature_dict_contract['Contract_Two year'] = 1
+feature_dict_contract['Contract_One year'] = 0
+X_contract = pd.DataFrame([feature_dict_contract])[feature_names]
+X_contract_scaled = scaler.transform(X_contract)
+prob_contract = model.predict_proba(X_contract_scaled)[0][1]
+contract_improvement = (prob - prob_contract) * 100
+
+with col_s3:
+    if contract_improvement > 0:
+        delta_color = "normal"
+        delta_label = f"↓ -{contract_improvement:.0f}%"
+    else:
+        delta_color = "inverse"
+        delta_label = f"↑ +{abs(contract_improvement):.0f}%"
+    st.metric(
+        "If 2-Year Contract",
+        f"{prob_contract:.0%}",
+        delta=delta_label,
+        delta_color=delta_color
+    )
 
 # --- SEGMENT PREDICTION ---
 cluster_input = {}
@@ -474,6 +533,14 @@ with st.expander("📊 Model Insights & Analytics"):
     col_a, col_b = st.columns(2)
     with col_a:
         fig, ax = plt.subplots(figsize=(8, 4))
+        # Set dark background for dark mode
+        if dark_mode:
+            fig.patch.set_facecolor('#1E1E1E')
+            ax.set_facecolor('#1E1E1E')
+            ax.tick_params(colors='white')
+            ax.xaxis.label.set_color('white')
+            ax.yaxis.label.set_color('white')
+            ax.title.set_color('white')
         sns.barplot(x='Importance', y='Feature', data=feature_importance, palette='Blues_d', ax=ax)
         ax.set_title('Top Predictors of Churn')
         ax.set_xlabel('Importance Score')
@@ -483,11 +550,16 @@ with st.expander("📊 Model Insights & Analytics"):
     
     with col_b:
         fig2, ax2 = plt.subplots(figsize=(8, 4))
+        if dark_mode:
+            fig2.patch.set_facecolor('#1E1E1E')
+            ax2.set_facecolor('#1E1E1E')
+            ax2.tick_params(colors='white')
+            ax2.title.set_color('white')
         colors = ['#2E86C1', '#28B463', '#F39C12', '#5B2C6F']
         ax2.pie(cluster_profiles['Count'], labels=cluster_profiles['Segment'], 
-                autopct='%1.1f%%', startangle=90, colors=colors)
+                autopct='%1.1f%%', startangle=90, colors=colors, textprops={'color': 'white'})
         ax2.axis('equal')
-        ax2.set_title('Customer Segment Distribution')
+        ax2.set_title('Customer Segment Distribution', color='white' if dark_mode else 'black')
         st.pyplot(fig2)
         plt.close(fig2)
     
@@ -499,7 +571,6 @@ with st.expander("📊 Model Insights & Analytics"):
     with col_d:
         st.subheader("Model Performance Comparison")
         st.dataframe(metrics_df.style.highlight_max(subset=['Accuracy', 'ROC-AUC'], color='lightgreen'), use_container_width=True)
-
 # --- FOOTER ---
 st.markdown("---")
 st.caption("Built with ❤️ using Streamlit | Random Forest (Churn) + Agglomerative Clustering (Segment) | Containerised with Docker")
