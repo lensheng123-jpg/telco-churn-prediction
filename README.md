@@ -45,7 +45,13 @@ This project predicts customer churn for a telecom company using **Logistic Regr
 3. Bundle online security and tech support to increase service adoption.
 
 ## Video Demo
-[Watch the presentation](https://youtu.be/your-link-here)
+Telco Customer Churn Prediction_Data analytics Part 1. https://youtu.be/pMF45e4Ay34
+Telco Customer Churn Prediction_Data analytics Part 2. https://youtu.be/j3hrw7H3NMU
+Comparison between Logistic Regression and Random Forest demo video. https://youtu.be/nTS1H__3yho
+
+
+
+
 
 ## Author
 [Na Kuan Li] – [BIT_B2201F-2505002]
