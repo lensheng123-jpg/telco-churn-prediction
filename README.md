@@ -46,7 +46,9 @@ This project predicts customer churn for a telecom company using **Logistic Regr
 
 ## Video Demo
 Telco Customer Churn Prediction_Data analytics Part 1. https://youtu.be/pMF45e4Ay34
+
 Telco Customer Churn Prediction_Data analytics Part 2. https://youtu.be/j3hrw7H3NMU
+
 Comparison between Logistic Regression and Random Forest demo video. https://youtu.be/nTS1H__3yho
 
 
