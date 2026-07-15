@@ -51,6 +51,23 @@ if dark_mode:
         .stExpander .stExpanderContent { background-color: #1E1E1E !important; color: #FFFFFF !important; border-radius: 0 0 8px 8px !important; }
         .stExpander .stExpanderContent .stMarkdown { color: #FFFFFF !important; }
         .stSubheader { color: #FFFFFF !important; }
+
+        /* ===== FIX: Model Selector (Radio) Text in Dark Mode ===== */
+        [data-testid="stRadio"] label {
+            color: #FFFFFF !important;
+        }
+        [data-testid="stRadio"] div[role="radiogroup"] p {
+            color: #FFFFFF !important;
+        }
+        [data-testid="stRadio"] div[role="radiogroup"] div {
+            color: #FFFFFF !important;
+        }
+        [data-testid="stRadio"] input[type="radio"] {
+            accent-color: #4FC3F7;
+        }
+        .stSidebar .stCaption, .stCaption {
+            color: #CCCCCC !important;
+        }
         </style>
         """,
         unsafe_allow_html=True
