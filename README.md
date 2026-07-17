@@ -49,7 +49,7 @@ Telco Customer Churn Prediction_Data analytics Part 1. https://youtu.be/pMF45e4A
 
 Telco Customer Churn Prediction_Data analytics Part 2. https://youtu.be/j3hrw7H3NMU
 
-Comparison between Logistic Regression and Random Forest demo video. [[https://youtu.be/nTS1H__3yho](https://youtu.be/Bo21vrFSXkc)](https://youtu.be/kPzb5maH-5I)
+Comparison between Logistic Regression and Random Forest demo video. https://youtu.be/-PacdhLaN2E
 
 
 
